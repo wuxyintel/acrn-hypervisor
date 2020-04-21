@@ -10,7 +10,7 @@
 #define MAX_PCPU_NUM	4U
 #define MAX_PLATFORM_CLOS_NUM	0U
 
-#define ROOTFS_0		"root=/dev/sda3 "
+#define ROOTFS_0		"root=/dev/vda3 "
 #define ROOTFS_1		"root=/dev/mmcblk0p1 "
 
 #define SOS_ROOTFS		ROOTFS_0

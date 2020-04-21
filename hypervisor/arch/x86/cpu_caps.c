@@ -413,10 +413,10 @@ int32_t detect_hardware_support(void)
 		(boot_cpu_data.virt_bits == 0U)) {
 		printf("%s, can't detect Linear/Physical Address size\n", __func__);
 		ret = -ENODEV;
-	} else if (!pcpu_has_cap(X86_FEATURE_INVA_TSC)) {
+	//} else if (!pcpu_has_cap(X86_FEATURE_INVA_TSC)) {
 		/* check invariant TSC */
-		printf("%s, invariant TSC not supported\n", __func__);
-		ret = -ENODEV;
+		//printf("%s, invariant TSC not supported\n", __func__);
+		//ret = -ENODEV;
 	} else if (!pcpu_has_cap(X86_FEATURE_TSC_DEADLINE)) {
 		/* lapic TSC deadline timer */
 		printf("%s, TSC deadline not supported\n", __func__);

@@ -15,7 +15,7 @@ config SCENARIO
 
 config MULTIBOOT2
 	bool "Multiboot2 support"
-	default y
+	default n
 	help
 	  Support boot ACRN from multiboot2 protocol. Multiboot2 support is needed for
 	  some EFI platforms to get correct ACPI RSDP, it also could provide host efi
@@ -203,7 +203,7 @@ config HV_RAM_SIZE
 config PLATFORM_RAM_SIZE
 	hex "Size of the physical platform RAM"
 	range 0x100000000 0x4000000000
-	default 0x400000000
+	default 0x100000000
 	help
 	  A 64-bit integer indicating the size of the physical platform RAM
 	  (MMIO not included).
@@ -211,7 +211,7 @@ config PLATFORM_RAM_SIZE
 config SOS_RAM_SIZE
 	hex "Size of the Service OS (SOS) RAM"
 	range 0x100000000 0x4000000000
-	default 0x400000000
+	default 0x100000000
 	help
 	  A 64-bit integer indicating the size of the Service OS RAM (MMIO not
 	  included).
@@ -219,7 +219,7 @@ config SOS_RAM_SIZE
  config UOS_RAM_SIZE
 	hex "Size of the User OS (UOS) RAM"
 	range 0 0x2000000000
-	default 0x200000000
+	default 0x20000000
 	help
 	  A 64-bit integer indicating the size of the User OS RAM (MMIO not
 	  included). Now we assume each UOS uses same amount of RAM size.

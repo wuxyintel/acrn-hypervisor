@@ -166,6 +166,8 @@ AS ?= as
 AR ?= ar
 LD ?= ld
 OBJCOPY ?= objcopy
+GRUBISO := grub_iso
+QEMU    := qemu-system-x86_64
 
 export CC AS AR LD OBJCOPY
 export CFLAGS ASFLAGS ARFLAGS LDFLAGS ARCH_CFLAGS ARCH_ASFLAGS ARCH_ARFLAGS ARCH_LDFLAGS
@@ -479,6 +481,35 @@ $(HV_OBJDIR)/$(HV_FILE).out: $(MODULES)
 	${BASH} ${LD_IN_TOOL} $(ARCH_LDSCRIPT_IN) $(ARCH_LDSCRIPT) ${HV_OBJDIR}/.config
 	$(CC) -Wl,-Map=$(HV_OBJDIR)/$(HV_FILE).map -o $@ $(LDFLAGS) $(ARCH_LDFLAGS) -T$(ARCH_LDSCRIPT) \
 		-Wl,--start-group $^ -Wl,--end-group
+
+$(LIB_FLAGS): lib
+
+QEMU_CPU := max,level=21
+QEMUOPTS += -machine q35,kernel_irqchip=split,accel=kvm -cpu $(QEMU_CPU)
+QEMUOPTS += -m 4G -smp cpus=4,cores=4,threads=1 -enable-kvm
+QEMUOPTS += -device isa-debug-exit -device intel-iommu,intremap=on,aw-bits=48,caching-mode=off,eim=on,device-iotlb=on
+QEMUOPTS += -drive file=/home/wuxiangyang/Tools/linux.img,index=0,format=raw,id=disk,if=none
+QEMUOPTS += -device ioh3420,id=pcie.1,chassis=1
+QEMUOPTS += -device virtio-blk-pci,bus=pcie.1,drive=disk,scsi=off,disable-legacy=on,disable-modern=off,iommu_platform=on,ats=on
+QEMUOPTS += -device e1000,netdev=net0 -netdev user,id=net0
+HVISO    := -boot d -cdrom $(HV_OBJDIR)/$(HV_FILE).iso
+QEMUOPTS += -serial mon:stdio -nographic
+LINUXPATH :=  /home/wuxiangyang/ACRN_dev/acrn-ebtool/acrn-kernel/arch/x86/boot
+ZEPHYRPATH := /home/wuxiangyang/rtos
+
+.PHONY: qemu
+qemu: $(HV_OBJDIR)/$(HV_FILE).iso
+	echo "-----"
+	$(QEMU) $(QEMUOPTS) $(HVISO) || true
+
+$(HV_OBJDIR)/$(HV_FILE).iso:
+	rm -rf $(HV_OBJDIR)/$(HV_FILE).iso
+	chmod a+x $(GRUBISO)
+	$(BASH) $(GRUBISO) $(HV_OBJDIR)/$(HV_FILE).iso $(HV_OBJDIR)/$(HV_FILE).32.out $(ZEPHYRPATH)/zephyr.bin $(LINUXPATH)/bzImage
+
+.PHONY: clearlinux
+clearlinux:
+	$(QEMU) $(OVMF) $(QEMUOPTS) || true
 
 .PHONY: clean
 clean:
